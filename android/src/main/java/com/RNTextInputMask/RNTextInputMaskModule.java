@@ -1,5 +1,6 @@
 package com.RNTextInputMask;
 
+import java.util.*;  
 import android.widget.EditText;
 import android.text.TextWatcher;
 import com.facebook.react.uimanager.UIManagerModule;
@@ -12,6 +13,9 @@ import com.facebook.react.bridge.Callback;
 import com.redmadrobot.inputmask.MaskedTextChangedListener;
 import com.redmadrobot.inputmask.model.CaretString;
 import com.redmadrobot.inputmask.helper.Mask;
+import com.redmadrobot.inputmask.model.CaretString.CaretGravity;
+import com.redmadrobot.inputmask.helper.AffinityCalculationStrategy;
+import com.redmadrobot.inputmask.model.Notation;
 
 public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
 
@@ -40,7 +44,8 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
       final Mask.Result result = mask.apply(
           new CaretString(
               input,
-              input.length()
+              input.length(),
+              CaretGravity.FORWARD
           ),
           true
       );
@@ -57,7 +62,8 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
       final Mask.Result result = mask.apply(
           new CaretString(
               input,
-              input.length()
+              input.length(),
+              CaretGravity.FORWARD
           ),
           true
       );
@@ -81,6 +87,9 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
                     public void run() {
                         MaskedTextChangedListener listener = new MaskedTextChangedListener(
                                 mask,
+                                Collections.<String>emptyList(),
+                                Collections.<Notation>emptyList(),
+                                AffinityCalculationStrategy.WHOLE_STRING,
                                 true,
                                 editText,
                                 null,
