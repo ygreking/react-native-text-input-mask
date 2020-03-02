@@ -66,7 +66,7 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void setMask(final int tag, final String mask) {
+    public void setMask(final int tag, final String mask, final boolean rightToLeft ) {
         // We need to use prependUIBlock instead of addUIBlock since subsequent UI operations in
         // the queue might be removing the view we're looking to update.
         reactContext.getNativeModule(UIManagerModule.class).prependUIBlock(new UIBlock() {
@@ -84,7 +84,8 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
                                 true,
                                 editText,
                                 null,
-                                null
+                                null,
+                                rightToLeft
                         );
 
                         if (editText.getTag(TEXT_CHANGE_LISTENER_TAG_KEY) != null) {
