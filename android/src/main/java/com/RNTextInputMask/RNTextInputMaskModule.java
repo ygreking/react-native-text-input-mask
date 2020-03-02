@@ -63,7 +63,7 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
           new CaretString(
               input,
               input.length(),
-              CaretGravity.FORWARD
+              CaretGravity.BACKWARD
           ),
           true
       );
