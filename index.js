@@ -19,6 +19,7 @@ export default class TextInputMask extends Component {
   };
 
   masked = false;
+  shouldClear = false;
 
   componentDidMount() {
     if (this.props.maskDefaultValue && this.props.mask && this.props.value) {
@@ -58,12 +59,12 @@ export default class TextInputMask extends Component {
   }
 
   clear() {
+    this.shouldClear = true;
     if (Platform.OS === "ios") {
       setText(findNodeHandle(this.input), "");
     } else {
       this.input.setNativeProps({ text: "" });
     }
-    this.props.onChangeText("");
   }
 
   render() {
@@ -83,7 +84,10 @@ export default class TextInputMask extends Component {
             : this.props.multiline
         }
         onChangeText={masked => {
-          if (this.props.mask) {
+          if (this.shouldClear) {
+            this.props.onChangeText("");
+            this.shouldClear = false;
+          } else if (this.props.mask) {
             const _unmasked = unmask(this.props.mask, masked, unmasked => {
               this.props.onChangeText &&
                 this.props.onChangeText(masked, unmasked);
