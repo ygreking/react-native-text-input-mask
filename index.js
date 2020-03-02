@@ -57,6 +57,15 @@ export default class TextInputMask extends Component {
     }
   }
 
+  clear() {
+    if (Platform.OS === "ios") {
+      setText(findNodeHandle(this.input), "");
+    } else {
+      this.input.setNativeProps({ text: "" });
+    }
+    this.props.onChangeText("");
+  }
+
   render() {
     return (
       <TextInput
