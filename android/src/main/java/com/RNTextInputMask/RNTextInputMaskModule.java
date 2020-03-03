@@ -9,6 +9,7 @@ import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.Callback;
 import com.redmadrobot.inputmask.MaskedTextChangedListener;
 import com.redmadrobot.inputmask.model.CaretString;
@@ -20,8 +21,6 @@ import com.redmadrobot.inputmask.model.Notation;
 public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
 
     private static final int TEXT_CHANGE_LISTENER_TAG_KEY = 123456789;
-
-
 
     ReactApplicationContext reactContext;
 
@@ -72,7 +71,7 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void setMask(final int tag, final String mask, final boolean rightToLeft ) {
+    public void setMask(final int tag, final String mask, final boolean rightToLeft, final ReadableArray affineMasks, final String affinityStrategy) {
         // We need to use prependUIBlock instead of addUIBlock since subsequent UI operations in
         // the queue might be removing the view we're looking to update.
         reactContext.getNativeModule(UIManagerModule.class).prependUIBlock(new UIBlock() {
@@ -81,15 +80,24 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
                 // The view needs to be resolved before running on the UI thread because there's
                 // a delay before the UI queue can pick up the runnable.
                 final EditText editText = (EditText) nativeViewHierarchyManager.resolveView(tag);
+                final List<String> affineFormats = new ArrayList<>();
+
+                for (int i = 0, size = affineMasks.size(); i < size; i++) {
+                    switch (affineMasks.getType(i)) {
+                      case String:
+                        affineFormats.add(affineMasks.getString(i));
+                        break;
+                    }
+                  }
 
                 reactContext.runOnUiQueueThread(new Runnable() {
                     @Override
                     public void run() {
                         MaskedTextChangedListener listener = new MaskedTextChangedListener(
                                 mask,
-                                Collections.<String>emptyList(),
+                                affineFormats,
                                 Collections.<Notation>emptyList(),
-                                AffinityCalculationStrategy.WHOLE_STRING,
+                                AffinityCalculationStrategy.valueOf(affinityStrategy),
                                 true,
                                 editText,
                                 null,

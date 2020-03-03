@@ -15,7 +15,9 @@ export { mask, unmask, setMask };
 export default class TextInputMask extends Component {
   static defaultProps = {
     maskDefaultValue: true,
-    rightToLeft: false
+    rightToLeft: false,
+    affineMasks: [],
+    affinityStrategy: "WHOLE_STRING"
   };
 
   masked = false;
@@ -35,7 +37,9 @@ export default class TextInputMask extends Component {
       setMask(
         findNodeHandle(this.input),
         this.props.mask,
-        this.props.rightToLeft
+        this.props.rightToLeft,
+        this.props.affineMasks,
+        this.props.affinityStrategy
       );
     }
   }
@@ -53,7 +57,9 @@ export default class TextInputMask extends Component {
       setMask(
         findNodeHandle(this.input),
         nextProps.mask,
-        this.props.rightToLeft
+        this.props.rightToLeft,
+        this.props.affineMasks,
+        this.props.affinityStrategy
       );
     }
   }
