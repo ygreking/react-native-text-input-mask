@@ -47,7 +47,7 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
               input.length(),
               CaretGravity.FORWARD
           ),
-          true
+          false
       );
       final String output = result.getFormattedText().getString();
       onResult.invoke(output);
