@@ -67,7 +67,9 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
           true
       );
       final String output = result.getExtractedValue();
-      onResult.invoke(output);
+      final boolean complete = result.getComplete();
+      final int affinity = result.getAffinity();
+      onResult.invoke(output, complete, affinity);
     }
 
     @ReactMethod

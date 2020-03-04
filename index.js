@@ -94,10 +94,19 @@ export default class TextInputMask extends Component {
             this.props.onChangeText("");
             this.shouldClear = false;
           } else if (this.props.mask) {
-            const _unmasked = unmask(this.props.mask, masked, unmasked => {
-              this.props.onChangeText &&
-                this.props.onChangeText(masked, unmasked);
-            });
+            const _unmasked = unmask(
+              this.props.mask,
+              masked,
+              (unmasked, isComplete, affinity) => {
+                this.props.onChangeText &&
+                  this.props.onChangeText(
+                    masked,
+                    unmasked,
+                    isComplete,
+                    affinity
+                  );
+              }
+            );
           } else {
             this.props.onChangeText && this.props.onChangeText(masked);
           }
