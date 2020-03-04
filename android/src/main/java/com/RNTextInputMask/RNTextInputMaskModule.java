@@ -24,6 +24,7 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
 
     ReactApplicationContext reactContext;
 
+    
     public RNTextInputMaskModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
@@ -34,43 +35,69 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
         return "RNTextInputMask";
     }
 
-    @ReactMethod
-    public void mask(final String maskString,
-                     final String inputValue,
-                     final Callback onResult) {
-      final Mask mask = new Mask(maskString);
-      final String input = inputValue;
-      final Mask.Result result = mask.apply(
-          new CaretString(
-              input,
-              input.length(),
-              CaretGravity.FORWARD
-          ),
-          false
-      );
-      final String output = result.getFormattedText().getString();
-      onResult.invoke(output);
+    
+    public String pickMask(final String inputValue, final String mask, final ReadableArray affineMasks, final String affinityStrategy) {
+        final String input = inputValue;
+        final AffinityCalculationStrategy affinityCalculationStrategy = AffinityCalculationStrategy.valueOf(affinityStrategy);
+        int maxAffinity = Integer.MIN_VALUE;
+        int maxAffinityIndex = -1;
+
+        for (int i = 0, size = affineMasks.size(); i < size; i++) {
+            int currentAffinity = affinityCalculationStrategy.calculateAffinityOfMask(
+                new Mask(affineMasks.getString(i)),
+                new CaretString(input, input.length(), CaretGravity.FORWARD),
+                false);
+
+            if( currentAffinity > maxAffinity){
+                    maxAffinity = currentAffinity;
+                    maxAffinityIndex = i;
+            }
+        }
+        
+         return (maxAffinityIndex > 0) ? affineMasks.getString(maxAffinityIndex) : mask;
     }
 
     @ReactMethod
-    public void unmask(final String maskString,
+    public void mask(final String maskString, final ReadableArray affineMasks, final String affinityStrategy,
                      final String inputValue,
                      final Callback onResult) {
-      final Mask mask = new Mask(maskString);
-      final String input = inputValue;
-      final Mask.Result result = mask.apply(
-          new CaretString(
-              input,
-              input.length(),
-              CaretGravity.BACKWARD
-          ),
-          true
-      );
-      final String output = result.getExtractedValue();
-      final boolean complete = result.getComplete();
-      final int affinity = result.getAffinity();
-      onResult.invoke(output, complete, affinity);
+        final String input = inputValue;
+        final String pickedMaskString = pickMask(inputValue, maskString, affineMasks, affinityStrategy);
+        final Mask mask = new Mask(pickedMaskString);
+        final Mask.Result result = mask.apply(
+            new CaretString(
+                input,
+                input.length(),
+                CaretGravity.FORWARD
+            ),
+            false
+        );
+        final String output = result.getFormattedText().getString();
+        onResult.invoke(output);
     }
+
+    @ReactMethod
+    public void unmask(final String maskString, final ReadableArray affineMasks, final String affinityStrategy,
+                     final String inputValue,
+                     final Callback onResult) {
+        final String input = inputValue;
+        final String pickedMaskString = pickMask(inputValue, maskString, affineMasks, affinityStrategy);
+        final Mask mask = new Mask(pickedMaskString);
+        final Mask.Result result = mask.apply(
+            new CaretString(
+                input,
+                input.length(),
+                CaretGravity.BACKWARD
+            ),
+            true
+        );
+        final String formatted = result.getFormattedText().getString();
+        final String extracted = result.getExtractedValue();
+        final boolean complete = result.getComplete();
+        final int affinity = result.getAffinity();
+        onResult.invoke(formatted, extracted, complete, pickedMaskString, affinity);
+    }
+
 
     @ReactMethod
     public void setMask(final int tag, final String mask, final boolean rightToLeft, final ReadableArray affineMasks, final String affinityStrategy) {

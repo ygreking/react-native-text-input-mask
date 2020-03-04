@@ -27,6 +27,8 @@ export default class TextInputMask extends Component {
     if (this.props.maskDefaultValue && this.props.mask && this.props.value) {
       mask(
         this.props.mask,
+        this.props.affineMasks,
+        this.props.affinityStrategy,
         "" + this.props.value,
         text => this.input && this.input.setNativeProps({ text })
       );
@@ -48,6 +50,9 @@ export default class TextInputMask extends Component {
     if (nextProps.mask && this.props.value !== nextProps.value) {
       mask(
         this.props.mask,
+        this.props.affineMasks,
+        this.props.affinityStrategy,
+
         "" + nextProps.value,
         text => this.input && this.input.setNativeProps({ text })
       );
@@ -96,13 +101,16 @@ export default class TextInputMask extends Component {
           } else if (this.props.mask) {
             const _unmasked = unmask(
               this.props.mask,
+              this.props.affineMasks,
+              this.props.affinityStrategy,
               masked,
-              (unmasked, isComplete, affinity) => {
+              (formatted, extracted, isComplete, pickedMask, affinity) => {
                 this.props.onChangeText &&
                   this.props.onChangeText(
-                    masked,
-                    unmasked,
+                    formatted,
+                    extracted,
                     isComplete,
+                    pickedMask,
                     affinity
                   );
               }
