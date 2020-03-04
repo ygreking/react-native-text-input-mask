@@ -10,7 +10,8 @@ import {
 const mask = NativeModules.RNTextInputMask.mask;
 const unmask = NativeModules.RNTextInputMask.unmask;
 const setMask = NativeModules.RNTextInputMask.setMask;
-export { mask, unmask, setMask };
+const maskAffinities = NativeModules.RNTextInputMask.maskAffinities;
+export { mask, unmask, setMask, maskAffinities };
 
 export default class TextInputMask extends Component {
   static defaultProps = {
@@ -104,15 +105,17 @@ export default class TextInputMask extends Component {
               this.props.affineMasks,
               this.props.affinityStrategy,
               masked,
-              (formatted, extracted, isComplete, pickedMask, affinity) => {
+              (
+                formatted,
+                extracted,
+                isComplete,
+                pickedMask,
+                affinity,
+                affinities
+              ) => {
+                const debug = { isComplete, pickedMask, affinity, affinities };
                 this.props.onChangeText &&
-                  this.props.onChangeText(
-                    formatted,
-                    extracted,
-                    isComplete,
-                    pickedMask,
-                    affinity
-                  );
+                  this.props.onChangeText(formatted, extracted, debug);
               }
             );
           } else {

@@ -57,6 +57,47 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
          return (maxAffinityIndex > 0) ? affineMasks.getString(maxAffinityIndex) : mask;
     }
 
+    public String getMaskAffinities(final String inputValue, final String mask, final ReadableArray affineMasks, final String affinityStrategy) {
+        final String input = inputValue;
+        final AffinityCalculationStrategy affinityCalculationStrategy = AffinityCalculationStrategy.valueOf(affinityStrategy);
+        final List<Integer> affinities = new ArrayList<>();
+
+        for (int i = 0, size = affineMasks.size(); i < size; i++) {
+            int currentAffinity = affinityCalculationStrategy.calculateAffinityOfMask(
+                new Mask(affineMasks.getString(i)),
+                new CaretString(input, input.length(), CaretGravity.FORWARD),
+                false);
+
+            affinities.add(currentAffinity);
+        }
+
+        final String out = affinities.toString();
+        return out;
+    }
+
+    @ReactMethod
+    public void maskAffinities(final String maskString, final ReadableArray affineMasks, final String affinityStrategy,
+        final String inputValue,
+        final Callback onResult) {
+
+        final String input = inputValue;
+        final AffinityCalculationStrategy affinityCalculationStrategy = AffinityCalculationStrategy.valueOf(affinityStrategy);
+        final List<Integer> affinities = new ArrayList<>();
+
+        for (int i = 0, size = affineMasks.size(); i < size; i++) {
+            int currentAffinity = affinityCalculationStrategy.calculateAffinityOfMask(
+                new Mask(affineMasks.getString(i)),
+                new CaretString(input, input.length(), CaretGravity.FORWARD),
+                false);
+
+            affinities.add(currentAffinity);
+        }
+
+        final String out = affinities.toString();
+        onResult.invoke(out);
+    }
+
+
     @ReactMethod
     public void mask(final String maskString, final ReadableArray affineMasks, final String affinityStrategy,
                      final String inputValue,
@@ -95,7 +136,8 @@ public class RNTextInputMaskModule extends ReactContextBaseJavaModule {
         final String extracted = result.getExtractedValue();
         final boolean complete = result.getComplete();
         final int affinity = result.getAffinity();
-        onResult.invoke(formatted, extracted, complete, pickedMaskString, affinity);
+        final String affinities = getMaskAffinities(inputValue, maskString, affineMasks, affinityStrategy);
+        onResult.invoke(formatted, extracted, complete, pickedMaskString, affinity, affinities);
     }
 
 
